@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>문자 발송 프로그램</title>
+  <link href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css" rel="stylesheet">
+</head>
+<body>
+<main class="container">
+  <div class="form-container">
+    <h1 style="text-align:center;">문자 보내기</h1>
+    <form id="smsForm">
+      <input type="text" id="to" name="to" placeholder="수신번호 입력 (+821012345678)" required>
+      <textarea id="message" name="message" placeholder="메시지를 입력하세요" rows="4" required></textarea>
+      <button type="submit" id="sendButton">발송하기</button>
+    </form>
+  </div>
+</main>
+<div id="toast"></div>
+
+<script>
+const form = document.getElementById('smsForm');
+const sendButton = document.getElementById('sendButton');
+const toast = document.getElementById('toast');
+
+function showToast(message, success=true) {
+  toast.innerText = message;
+  toast.style.backgroundColor = success ? '#4CAF50' : '#f44336';
+  toast.className = 'show';
+  setTimeout(() => {
+    toast.className = toast.className.replace('show', '');
+  }, 3000);
+}
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const to = document.getElementById('to').value;
+  const message = document.getElementById('message').value;
+
+  sendButton.disabled = true;
+  sendButton.innerText = '발송 중...';
+
+  try {
+    const response = await fetch('/send-sms', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ to, message })
+    });
+    const data = await response.json();
+
+    if (data.success) {
+      showToast('✅ 문자 발송 성공!', true);
+      form.reset();
+    } else {
+      showToast('❌ 문자 발송 실패: ' + data.error, false);
+    }
+  } catch (err) {
+    showToast('❌ 에러 발생', false);
+  }
+
+  sendButton.disabled = false;
+  sendButton.innerText = '발송하기';
+});
+</script>
+</body>
+</html>
