@@ -4,7 +4,8 @@
   "description": "SMS sending server",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "test": "echo \"No tests specified\" && exit 0"    ←★ 새로 추가된 부분
   },
   "dependencies": {
     "axios": "^1.6.2",
